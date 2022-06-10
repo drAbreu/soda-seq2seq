@@ -36,8 +36,9 @@ class Seq2Seq:
                  # MODEL PARAMETERS
                  max_output_length: int = 128,
                  min_output_length: int = 32,
-                 num_beams: int = 2
+                 num_beams: int = 2,
                  # TRAINING PARAMETERS
+                 output_training_folder: str = "training_log"
                  ):
 
         self.datapath = datapath
