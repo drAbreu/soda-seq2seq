@@ -53,6 +53,7 @@ class Seq2Seq:
         self.max_output_length = max_output_length
         self.min_output_length = min_output_length
         self.num_beams = num_beams
+        self.output_training_folder = output_training_folder
         self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
 
         try:
@@ -98,8 +99,8 @@ class Seq2Seq:
                                                padding=True,
                                                return_tensors='pt')
 
-        training_args = TrainingArguments()
-        trainer = Seq2SeqTrainer()
+        training_args = TrainingArguments(self.output_training_folder)
+        trainer = Seq2SeqTrainer(**training_args)
         trainer.train()
 
     def _preprocess_data(self, examples):
