@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger('seq2seq.data_utils')
 
 def load_dataset_into_hf(datapath: str, delimiter:str, task: str, split: List[float] = [0.8, 0.1, 0.1],
-                         skip_lines: int = 0) -> DatasetDict[Dataset]:
+                         skip_lines: int = 0) -> DatasetDict:
     """
     Loads a file encoded as a `csv` into a format that can be used
     by the `Seq2Seq` class.
