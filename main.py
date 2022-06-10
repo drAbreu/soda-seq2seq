@@ -100,7 +100,7 @@ class Seq2Seq:
                                                return_tensors='pt')
 
         training_args = TrainingArguments(self.output_training_folder)
-        trainer = Seq2SeqTrainer(**training_args)
+        trainer = Seq2SeqTrainer(training_args)
         trainer.train()
 
     def _preprocess_data(self, examples):
