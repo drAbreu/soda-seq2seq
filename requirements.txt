@@ -1,0 +1,10 @@
+torch==1.9.0  # 776.8 MB
+transformers
+datasets==2.2.1
+nltk
+scikit-learn
+python-dotenv
+seqeval
+numpy
+pandas
+accelerate
