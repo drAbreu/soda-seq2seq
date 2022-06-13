@@ -53,6 +53,31 @@ class SodaSeq2SeqTrainer:
         self.from_local_checkpoint = from_local_checkpoint
         self.base_model = base_model
 
+
+        if from_local_checkpoint:
+            logger.info(f"Downloading the model based on: {self.base_model} and checkpoint{self.from_local_checkpoint}")
+            if 'bart' in self.base_model:
+                self.model = BartForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
+                                                                          **self.model_param.__dict__)
+                self.tokenizer = AutoTokenizer.from_pretrained(self.base_model)
+            elif 't5' in self.base_model:
+                self.model = T5ForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
+                                                                        **self.model_param.__dict__)
+                self.tokenizer = AutoTokenizer.from_pretrained(self.base_model)
+        else:
+            logger.info(f"Downloading the model based on: {self.from_pretrained}")
+            if 'bart' in self.from_pretrained:
+                self.model = BartForConditionalGeneration.from_pretrained(self.from_pretrained,
+                                                                          **self.model_param.__dict__)
+                self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
+            elif 't5' in self.from_pretrained:
+                self.model = T5ForConditionalGeneration.from_pretrained(self.from_pretrained,
+                                                                        **self.model_param.__dict__)
+                self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
+            else:
+                raise ValueError(f"""Please select a model that is compatible wit the 
+                                    conditional generation task: {['bart', 't5']}.""")
+
         try:
             logger.info(f"Obtaining data from the HuggingFace 🤗 Hub: {self.datapath}")
             self.dataset = load_dataset(self.datapath)
@@ -66,29 +91,6 @@ class SodaSeq2SeqTrainer:
         logger.info(f"""Tokenizing the data using the tokenizer of model {self.from_pretrained}\n
                         {self.tokenizer}""")
         self.tokenized_dataset = self._tokenize_data()
-
-        logger.info(f"Downloading the model based on: {self.from_pretrained}")
-        if from_local_checkpoint:
-            if 'bart' in self.base_model:
-                self.model = BartForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
-                                                                          **self.model_param.__dict__)
-                self.tokenizer = AutoTokenizer.from_pretrained(self.base_model)
-            elif 't5' in self.base_model:
-                self.model = T5ForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
-                                                                        **self.model_param.__dict__)
-                self.tokenizer = AutoTokenizer.from_pretrained(self.base_model)
-        else:
-            if 'bart' in self.from_pretrained:
-                self.model = BartForConditionalGeneration.from_pretrained(self.from_pretrained,
-                                                                          **self.model_param.__dict__)
-                self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
-            elif 't5' in self.from_pretrained:
-                self.model = T5ForConditionalGeneration.from_pretrained(self.from_pretrained,
-                                                                        **self.model_param.__dict__)
-                self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
-            else:
-                raise ValueError(f"""Please select a model that is compatible wit the 
-                                    conditional generation task: {['bart', 't5']}.""")
 
     def __str__(self):
         print(self.tokenizer)
