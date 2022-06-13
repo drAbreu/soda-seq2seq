@@ -25,6 +25,8 @@ class SodaSeq2SeqTrainer:
                  delimiter: str,
                  from_pretrained: str,
                  task: str,
+                 from_local_checkpoint: str = None,
+                 base_model: str = None,
                  # DATA GENERATION
                  split: List[float] = [0.8, 0.1, 0.1],
                  skip_lines: int = 0,
@@ -48,7 +50,8 @@ class SodaSeq2SeqTrainer:
         self.skip_lines = skip_lines
         self.model_param = model_param
         self.training_args = training_args
-        self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
+        self.from_local_checkpoint = from_local_checkpoint
+        self.base_model = base_model
 
         try:
             logger.info(f"Obtaining data from the HuggingFace 🤗 Hub: {self.datapath}")
@@ -65,15 +68,27 @@ class SodaSeq2SeqTrainer:
         self.tokenized_dataset = self._tokenize_data()
 
         logger.info(f"Downloading the model based on: {self.from_pretrained}")
-        if 'bart' in self.from_pretrained:
-            self.model = BartForConditionalGeneration.from_pretrained(self.from_pretrained,
-                                                                      **self.model_param.__dict__)
-        elif 't5' in self.from_pretrained:
-            self.model = T5ForConditionalGeneration.from_pretrained(self.from_pretrained,
-                                                                    **self.model_param.__dict__)
+        if from_local_checkpoint:
+            if 'bart' in self.base_model:
+                self.model = BartForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
+                                                                          **self.model_param.__dict__)
+                self.tokenizer = AutoTokenizer.from_pretrained(self.base_model)
+            elif 't5' in self.base_model:
+                self.model = T5ForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
+                                                                        **self.model_param.__dict__)
+                self.tokenizer = AutoTokenizer.from_pretrained(self.base_model)
         else:
-            raise ValueError(f"""Please select a model that is compatible wit the 
-                                conditional generation task: {['bart', 't5']}.""")
+            if 'bart' in self.from_pretrained:
+                self.model = BartForConditionalGeneration.from_pretrained(self.from_pretrained,
+                                                                          **self.model_param.__dict__)
+                self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
+            elif 't5' in self.from_pretrained:
+                self.model = T5ForConditionalGeneration.from_pretrained(self.from_pretrained,
+                                                                        **self.model_param.__dict__)
+                self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
+            else:
+                raise ValueError(f"""Please select a model that is compatible wit the 
+                                    conditional generation task: {['bart', 't5']}.""")
 
     def __str__(self):
         print(self.tokenizer)

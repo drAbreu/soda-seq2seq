@@ -91,7 +91,8 @@ class ShowExample(TrainerCallback):
 
 
 class MyTensorBoardCallback(TensorBoardCallback):
-    """Display log and metrics. Modified to plot losses together and to plot supp_data items passed in the model output. Also looks for logs elements with  _img_ in keys to display as images."""
+    """Display log and metrics. Modified to plot losses together and to plot supp_data items
+    passed in the model output. Also looks for logs elements with  _img_ in keys to display as images."""
 
     def on_train_begin(self, args, state, control, **kwargs):
         if not state.is_world_process_zero:
@@ -154,14 +155,6 @@ class MyTensorBoardCallback(TensorBoardCallback):
         """
         group into 'losses' eval/loss and train/loss into with the loss breakdown provided as supp_data
         """
-
-        # example on training setp
-        # {'loss': 21.4436, 'learning_rate': 4.9970059880239524e-05, 'epoch': 0.06}
-        # example on evaluation step
-        # {'eval_loss': 19.32028579711914, 'eval_supp_data_loss_diag': 0.23595364391803741, 'eval_supp_data_loss_off_diag': 0.9614391922950745, 'eval_supp_data_loss_twin_z': 1.1973928213119507,
-        # 'eval_supp_data_loss_z_1': 0.0, 'eval_supp_data_loss_z_2': 0.0, 'eval_supp_data_loss_lm_1': 8.891294479370117, 'eval_supp_data_loss_lm_2': 9.229777336120605, 'eval_runtime': 25.7975,
-        # 'eval_samples_per_second': 102.762, 'eval_steps_per_second': 2.171, 'epoch': 0.06}
-
         new_d = {}
         for k, v in d.items():
             if k == "loss":

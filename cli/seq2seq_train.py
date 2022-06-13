@@ -15,6 +15,15 @@ if __name__ == '__main__':
                         default="facebook/bart-base",
                         help="""🤗 model repository to be used as base model for training.
                         It can also be the path to a checkpoint that would be further trained.""")
+    parser.add_argument("--from_local_checkpoint",
+                        default="",
+                        help="""Begin the training from a previous checkpoint stored locally. 
+                        If the model is in the 🤗, then using from_pretrained would be enough.
+                        Must be set with base_model.""")
+    parser.add_argument("--base_model",
+                        default="facebook/bart-base",
+                        help="""Base-model of the checkpoint to be further trained. This will be used to instantiate
+                        the model and the tokenizer.""")
     parser.add_argument("--task",
                         default="Causal hypothesis: ",
                         choices=["Causal hypothesis: ", "multitask"],
@@ -49,11 +58,15 @@ if __name__ == '__main__':
     skip_lines = int(args.skip_lines)
     max_input_length = int(args.max_input_length)
     max_target_length = int(args.max_target_length)
+    from_local_checkpoint = args.from_local_checkpoint
+    base_model = args.base_model
 
     seq2seq = SodaSeq2SeqTrainer(data_loader,
                                  delimiter,
                                  from_pretrained,
                                  task,
+                                 from_checkpoint=from_checkpoint,
+                                 base_model=base_model,
                                  split=split,
                                  skip_lines=skip_lines,
                                  max_input_length=max_input_length,
