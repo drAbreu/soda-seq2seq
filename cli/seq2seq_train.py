@@ -65,7 +65,7 @@ if __name__ == '__main__':
                                  delimiter,
                                  from_pretrained,
                                  task,
-                                 from_checkpoint=from_checkpoint,
+                                 from_checkpoint=from_local_checkpoint,
                                  base_model=base_model,
                                  split=split,
                                  skip_lines=skip_lines,
