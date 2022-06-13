@@ -6,7 +6,8 @@ from transformers import (AutoTokenizer, DataCollatorForSeq2Seq,
 from typing import List
 from setup_logger import logger
 from data_classes import TrainingArgumentsSeq2Seq, ModelConfigSeq2Seq
-
+from transformers.integrations import TensorBoardCallback
+from callbacks import ShowExample
 import logging
 
 logger = logging.getLogger('seq2seq.main')
@@ -93,7 +94,8 @@ class SodaSeq2SeqTrainer:
                                     data_collator=data_collator,
                                     train_dataset=self.tokenized_dataset['train'],
                                     eval_dataset=self.tokenized_dataset['eval'],
-                                    tokenizer=self.tokenizer
+                                    tokenizer=self.tokenizer,
+                                    callbacks=[TensorBoardCallback, ShowExample(self.tokenizer)]
                                 )
         trainer.train()
 

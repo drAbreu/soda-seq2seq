@@ -8,9 +8,9 @@ class TrainingArgumentsSeq2Seq(TrainingArguments):
     output_dir: str = field(default=SEQ2SEQ_MODEL_PATH)
     overwrite_output_dir: bool = field(default=True)
     do_train: bool = field(default=False)
-    do_eval: bool = field(default=False)
+    do_eval: bool = field(default=True)
     do_predict: bool = field(default=False)
-    evaluation_strategy: IntervalStrategy = field(default="no")
+    evaluation_strategy: IntervalStrategy = field(default="steps")
     prediction_loss_only: bool = field(default=False)
     per_device_train_batch_size: int = field(default=4)
     per_device_eval_batch_size: int = field(default=4)
@@ -38,7 +38,7 @@ class TrainingArgumentsSeq2Seq(TrainingArguments):
     save_total_limit: Optional[int] = field(default=None)
     seed: int = field(default=42)
     dataloader_drop_last: bool = field(default=False)
-    eval_steps: int = field(default=None)
+    eval_steps: int = field(default=5)
     dataloader_num_workers: int = field(default=0)
     run_name: Optional[str] = field(default=None)
     disable_tqdm: Optional[bool] = field(default=None)
@@ -47,9 +47,7 @@ class TrainingArgumentsSeq2Seq(TrainingArguments):
     metric_for_best_model: Optional[str] = field(default=None)
     greater_is_better: Optional[bool] = field(default=None)
     adafactor: bool = field(default=False, metadata={"help": "Whether or not to replace AdamW by Adafactor."})
-    report_to: Optional[List[str]] = field(
-        default=None, metadata={"help": "The list of integrations to report the results and logs to."}
-    )
+    report_to: Optional[List[str]] = field(default='tensorboard')
     ddp_find_unused_parameters: Optional[bool] = field(default=None)
     push_to_hub: bool = field(default=False)
     resume_from_checkpoint: Optional[str] = field(default=None)
@@ -57,6 +55,10 @@ class TrainingArgumentsSeq2Seq(TrainingArguments):
     # hub_strategy: HubStrategy = field(default="every_save")
     hub_token: str = field(default=None, metadata={"help": "The token to use to push to the Model Hub."})
     gradient_checkpointing: bool = field(default=False)
+    generation_max_length: int = field(default=128)
+    generation_num_beams: int = field(default=2)
+    predict_with_generate: bool = field(default=True)
+
 
 @dataclass
 class ModelConfigSeq2Seq(PretrainedConfig):

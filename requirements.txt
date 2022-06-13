@@ -8,3 +8,4 @@ seqeval
 numpy
 pandas
 accelerate
+tensorboard
