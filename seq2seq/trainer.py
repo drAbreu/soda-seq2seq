@@ -95,9 +95,10 @@ class SodaSeq2SeqTrainer:
                                     train_dataset=self.tokenized_dataset['train'],
                                     eval_dataset=self.tokenized_dataset['eval'],
                                     tokenizer=self.tokenizer,
-                                    callbacks=[MyTensorBoardCallback,
-                                               ShowExample(self.tokenizer)]
+                                    callbacks=[ShowExample(self.tokenizer)]
                                 )
+        trainer.remove_callback(TensorBoardCallback)  # remove default Tensorboard callback
+        trainer.add_callback(MyTensorBoardCallback)  # replace with customized callback
         trainer.train()
 
     def _preprocess_data(self, examples):
