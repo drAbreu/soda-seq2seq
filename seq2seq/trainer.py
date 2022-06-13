@@ -120,7 +120,7 @@ class SodaSeq2SeqTrainer:
         return self.dataset.map(self._preprocess_data,
                                 batched=True)
 
-    def _get_tokenizer_and_model(self):
+    def _get_model_and_tokenizer(self):
         if self.from_local_checkpoint:
             logger.info(f"Downloading the model based on: {self.base_model} and checkpoint{self.from_local_checkpoint}")
             if 'bart' in self.base_model:
