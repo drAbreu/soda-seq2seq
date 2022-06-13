@@ -53,30 +53,7 @@ class SodaSeq2SeqTrainer:
         self.from_local_checkpoint = from_local_checkpoint
         self.base_model = base_model
 
-
-        if from_local_checkpoint:
-            logger.info(f"Downloading the model based on: {self.base_model} and checkpoint{self.from_local_checkpoint}")
-            if 'bart' in self.base_model:
-                self.model = BartForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
-                                                                          **self.model_param.__dict__)
-                self.tokenizer = AutoTokenizer.from_pretrained(self.base_model)
-            elif 't5' in self.base_model:
-                self.model = T5ForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
-                                                                        **self.model_param.__dict__)
-                self.tokenizer = AutoTokenizer.from_pretrained(self.base_model)
-        else:
-            logger.info(f"Downloading the model based on: {self.from_pretrained}")
-            if 'bart' in self.from_pretrained:
-                self.model = BartForConditionalGeneration.from_pretrained(self.from_pretrained,
-                                                                          **self.model_param.__dict__)
-                self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
-            elif 't5' in self.from_pretrained:
-                self.model = T5ForConditionalGeneration.from_pretrained(self.from_pretrained,
-                                                                        **self.model_param.__dict__)
-                self.tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
-            else:
-                raise ValueError(f"""Please select a model that is compatible wit the 
-                                    conditional generation task: {['bart', 't5']}.""")
+        self.tokenizer, self.model = self._get_model_and_tokenizer()
 
         try:
             logger.info(f"Obtaining data from the HuggingFace 🤗 Hub: {self.datapath}")
@@ -142,3 +119,30 @@ class SodaSeq2SeqTrainer:
     def _tokenize_data(self):
         return self.dataset.map(self._preprocess_data,
                                 batched=True)
+
+    def _get_tokenizer_and_model(self):
+        if self.from_local_checkpoint:
+            logger.info(f"Downloading the model based on: {self.base_model} and checkpoint{self.from_local_checkpoint}")
+            if 'bart' in self.base_model:
+                model = BartForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
+                                                                          **self.model_param.__dict__)
+            elif 't5' in self.base_model:
+                model = T5ForConditionalGeneration.from_pretrained(self.from_local_checkpoint,
+                                                                        **self.model_param.__dict__)
+            else:
+                raise ValueError(f"""Please select a model that is compatible with the 
+                                    conditional generation task: {['bart', 't5']}.""")
+            tokenizer = AutoTokenizer.from_pretrained(self.base_model)
+        else:
+            logger.info(f"Downloading the model based on: {self.from_pretrained}")
+            if 'bart' in self.from_pretrained:
+                model = BartForConditionalGeneration.from_pretrained(self.from_pretrained,
+                                                                          **self.model_param.__dict__)
+            elif 't5' in self.from_pretrained:
+                model = T5ForConditionalGeneration.from_pretrained(self.from_pretrained,
+                                                                        **self.model_param.__dict__)
+            else:
+                raise ValueError(f"""Please select a model that is compatible wit the 
+                                    conditional generation task: {['bart', 't5']}.""")
+            tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
+        return tokenizer, model
