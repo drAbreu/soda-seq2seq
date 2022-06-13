@@ -7,7 +7,7 @@ from typing import List
 from setup_logger import logger
 from data_classes import TrainingArgumentsSeq2Seq, ModelConfigSeq2Seq
 from transformers.integrations import TensorBoardCallback
-from callbacks import ShowExample
+from callbacks import ShowExample, MyTensorBoardCallback
 import logging
 
 logger = logging.getLogger('seq2seq.main')
@@ -95,7 +95,8 @@ class SodaSeq2SeqTrainer:
                                     train_dataset=self.tokenized_dataset['train'],
                                     eval_dataset=self.tokenized_dataset['eval'],
                                     tokenizer=self.tokenizer,
-                                    callbacks=[TensorBoardCallback, ShowExample(self.tokenizer)]
+                                    callbacks=[MyTensorBoardCallback,
+                                               ShowExample(self.tokenizer)]
                                 )
         trainer.train()
 

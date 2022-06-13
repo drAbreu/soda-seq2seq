@@ -30,7 +30,7 @@ class TrainingArgumentsSeq2Seq(TrainingArguments):
     log_level: Optional[str] = field(default="passive")
     logging_dir: Optional[str] = field(default=None)
     logging_strategy: IntervalStrategy = field(default="steps")
-    logging_first_step: bool = field(default=False)
+    logging_first_step: bool = field(default=True)
     logging_steps: int = field(default=500)
     logging_nan_inf_filter: str = field(default=True)
     save_strategy: IntervalStrategy = field(default="steps")
