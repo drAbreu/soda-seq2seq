@@ -125,3 +125,5 @@ runs/
 
 # MAC
 .DS_Store
+
+seq2seq_models
