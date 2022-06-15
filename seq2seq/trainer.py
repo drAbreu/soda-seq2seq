@@ -82,6 +82,7 @@ class SodaSeq2SeqTrainer:
         logger.info(f"""Preparing the data collator""")
         data_collator = DataCollatorForSeq2Seq(tokenizer=self.tokenizer,
                                                model=self.model,
+                                               truncation=True,
                                                padding=True,
                                                return_tensors='pt')
 
@@ -100,7 +101,7 @@ class SodaSeq2SeqTrainer:
             trainer.train()
 
         if self.training_args.do_predict:
-            test_dataloader = DataLoader(self.tokenized_dataset['test'], batch_size=64, collate_fn=data_collator)
+            test_dataloader = DataLoader(self.tokenized_dataset['test'], batch_size=32, collate_fn=data_collator)
             self.model.eval()
             output_predictions, output_labels = [], []
             for batch in test_dataloader:
