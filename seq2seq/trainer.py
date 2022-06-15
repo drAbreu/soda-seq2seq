@@ -105,7 +105,7 @@ class SodaSeq2SeqTrainer:
                 with torch.no_grad():
                     batch_labels = self.tokenizer.decode(example['labels'], skip_special_tokens=True)
                     outputs = self.model.generate(torch.tensor([example['input_ids']]))
-                    batch_predictions = self.tokenizer.decode(outputs, skip_special_tokens=True)
+                    batch_predictions = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
                     for l, p in zip(batch_labels, batch_predictions):
                         output_predictions.append(p)
                         output_labels.append(l)
