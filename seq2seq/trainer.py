@@ -9,6 +9,9 @@ from data_classes import TrainingArgumentsSeq2Seq, ModelConfigSeq2Seq
 from transformers.integrations import TensorBoardCallback
 from callbacks import ShowExample, MyTensorBoardCallback
 import logging
+from torch.utils.data import DataLoader
+import torch
+from metrics import ClassificationSeq2Seq
 
 logger = logging.getLogger('seq2seq.main')
 
@@ -82,18 +85,42 @@ class SodaSeq2SeqTrainer:
                                                padding=True,
                                                return_tensors='pt')
 
-        trainer = Seq2SeqTrainer(
-                                    model=self.model,
-                                    args=self.training_args,
-                                    data_collator=data_collator,
-                                    train_dataset=self.tokenized_dataset['train'],
-                                    eval_dataset=self.tokenized_dataset['eval'],
-                                    tokenizer=self.tokenizer,
-                                    callbacks=[ShowExample(self.tokenizer)]
-                                )
-        trainer.remove_callback(TensorBoardCallback)  # remove default Tensorboard callback
-        trainer.add_callback(MyTensorBoardCallback)  # replace with customized callback
-        trainer.train()
+        if self.training_args.do_train:
+            trainer = Seq2SeqTrainer(
+                                        model=self.model,
+                                        args=self.training_args,
+                                        data_collator=data_collator,
+                                        train_dataset=self.tokenized_dataset['train'],
+                                        eval_dataset=self.tokenized_dataset['eval'],
+                                        tokenizer=self.tokenizer,
+                                        callbacks=[ShowExample(self.tokenizer)]
+                                    )
+            trainer.remove_callback(TensorBoardCallback)  # remove default Tensorboard callback
+            trainer.add_callback(MyTensorBoardCallback)  # replace with customized callback
+            trainer.train()
+
+        if self.training_args.do_predict:
+            test_dataloader = DataLoader(self.tokenized_dataset['test'], batch_size=64, collate_fn=data_collator)
+            self.model.eval()
+            output_predictions, output_labels = [], []
+            for batch in test_dataloader:
+                batch = {k: v.to(self.device) for k, v in batch.items()}
+                with torch.no_grad():
+                    batch_labels = self.tokenizer.decode(batch['labels'], skip_special_tokens=True)
+                    outputs = self.model.generate(batch['input_ids'])
+                    batch_predictions = self.tokenizer.decode(outputs, skip_special_tokens=True)
+                    for l, p in zip(batch_labels, batch_predictions):
+                        output_predictions.append(p)
+                        output_labels.append(l)
+            # Call to my metrics calculator
+            metrics_role = ClassificationSeq2Seq(task="roles")
+            metrics_ner = ClassificationSeq2Seq(task="ner")
+            metrics_exp = ClassificationSeq2Seq(task="experiment")
+            metrics_role(output_predictions, output_labels)
+            metrics_ner(output_predictions, output_labels)
+            metrics_exp(output_predictions, output_labels)
+
+
 
     def _preprocess_data(self, examples):
         """

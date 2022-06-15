@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from datasets import Dataset, DatasetDict
-from typing import List
+from typing import List, Tuple, Dict
 import numpy as np
 from setup_logger import logger
 import logging
+import re
 
 logger = logging.getLogger('seq2seq.data_utils')
 
@@ -54,3 +55,70 @@ def load_dataset_into_hf(datapath: str, delimiter:str, task: str, split: List[fl
                             'test': Dataset.from_dict(data_output['test'])
                         }
                        )
+
+
+def get_label_entity_pairs(text: str) -> List[Tuple[str, str]]:
+    """
+    This is a function intended mainly for supporting metrics evaluation. It will return a list with
+    labels in the text. We define the labels as a pair `label` -> `entity` encoded as `label:entity`
+    in the text.
+    :param text: `str` text where the labels are to be found.
+    :return: `list` of `tuple` `label` -> `entity`
+    """
+    label_entity_pair_reg = r"([a-z]+)\:(.[a-zA-Z0-9].+?(?=and|or|on|by|was|$))"
+    return re.findall(label_entity_pair_reg, text)
+
+
+def get_control_measure_exp_mentions(
+        text: str,
+        separators: List[str] = ["was tested for its influence", "by"]
+        ) -> Dict[str, str]:
+    """
+    This is a function intended mainly for supporting metrics evaluation. It will return a list with
+    labels in the text. We define the labels as a pair `label` -> `entity` encoded as `label:entity`
+    in the text.
+    :param text: `str` text where the labels are to be found.
+    :param separators: `list` of `str` wirth the standarized text in the inputs.
+                        Will be used to separate into controled, measured and experiment.
+    :return: `list` of `tuple` `label` -> `entity`
+    """
+    regex_str = f"({separators[0]})|({separators[1]})"
+    split_text = re.split(regex_str, text)
+    separators += [None]
+
+    output = {}
+    output_list = [text for text in split_text if text not in separators]
+    if len(output_list) == 3:
+        output['control'] = output_list[0]
+        output['measured'] = output_list[1]
+        output['experiment'] = output_list[2]
+    elif len(output_list) == 2:
+        output['control'] = output_list[0]
+        output['measured'] = output_list[1]
+        output['experiment'] = ""
+        logger.warning(f"The example: {text} has only two text outputs. It might have an infinite"
+                       f"loop on the model prediction.")
+    else:
+        raise NotImplementedError
+    return output
+
+
+def get_labelled_data(
+        text: str,
+        separators: List[str] = ["was tested for its influence", "by"]
+        ) -> Tuple[Tuple[str, str], Tuple[str, str], str]:
+    """
+    This is a function intended mainly for supporting metrics evaluation. It will return a list with
+    labels in the text. We define the labels as a pair `label` -> `entity` encoded as `label:entity`
+    in the text.
+    :param text: `str` text where the labels are to be found.
+    :param separators: `list` of `str` wirth the standarized text in the inputs.
+                        Will be used to separate into controled, measured and experiment.
+    :return: `list` of `tuple`, `tuple`, `str`
+    """
+    groups = get_control_measure_exp_mentions(text, separators=separators)
+
+    label_entity_control = get_label_entity_pairs(groups['control'])
+    label_entity_measured = get_label_entity_pairs(groups['measured'])
+
+    return label_entity_control, label_entity_measured, groups['experiment']

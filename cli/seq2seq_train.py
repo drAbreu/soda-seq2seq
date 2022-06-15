@@ -3,7 +3,7 @@ import logging
 from seq2seq.trainer import SodaSeq2SeqTrainer
 from transformers import HfArgumentParser
 from data_classes import TrainingArgumentsSeq2Seq, ModelConfigSeq2Seq
-logger = logging.getLogger('seq2seq.main')
+logger = logging.getLogger('seq2seq.train')
 
 
 # Press the green button in the gutter to run the script.

@@ -17,7 +17,7 @@ The way to install this repo is as with any other `venv` repo.
     pip install -r requirements.txt
 ```
 
-Training the model from a model in the 🤗 Hub.
+Training the model from a model in the 🤗 Hub. At the moment only the `BART` and `T5` models are supported
 
 ```shell
   python -m cli.seq2seq_train ./data/sd-seq2seq-clean.csv \
