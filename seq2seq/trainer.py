@@ -100,14 +100,11 @@ class SodaSeq2SeqTrainer:
             trainer.train()
 
         if self.training_args.do_predict:
-            test_dataloader = DataLoader(self.tokenized_dataset['test'], batch_size=1, collate_fn=data_collator)
-            self.model.eval()
             output_predictions, output_labels = [], []
-            for batch in test_dataloader:
-                batch = {k: v.to(self.device) for k, v in batch.items()}
+            for example in self.tokenized_dataset['test']:
                 with torch.no_grad():
-                    batch_labels = self.tokenizer.decode(batch['labels'], skip_special_tokens=True)
-                    outputs = self.model.generate(batch['input_ids'])
+                    batch_labels = self.tokenizer.decode(example['labels'], skip_special_tokens=True)
+                    outputs = self.model.generate(example['input_ids'])
                     batch_predictions = self.tokenizer.decode(outputs, skip_special_tokens=True)
                     for l, p in zip(batch_labels, batch_predictions):
                         output_predictions.append(p)
