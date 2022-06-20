@@ -76,11 +76,6 @@ class SodaSeq2SeqTrainer:
                         {self.tokenizer}""")
         self.tokenized_dataset = self._tokenize_data()
 
-    def __str__(self):
-        print(self.tokenizer)
-        print(self.tokenized_dataset['train'][0])
-        return "Everything is running on a good way"
-
     def __call__(self):
 
         logger.info(f"""Preparing the data collator""")
@@ -125,8 +120,6 @@ class SodaSeq2SeqTrainer:
             metrics_ner(flat_predictions, self.tokenized_dataset['test']['target'])
             logger.info("Metric evaluation for experiments")
             metrics_exp(flat_predictions, self.tokenized_dataset['test']['target'])
-
-
 
     def _preprocess_data(self, examples):
         """

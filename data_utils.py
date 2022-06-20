@@ -131,6 +131,7 @@ def get_labelled_data(
     :return: `list` of `tuple`, `tuple`, `str`
     """
     groups = get_control_measure_exp_mentions(text, separators=separators)
+    print(groups)
 
     label_entity_control = get_label_entity_pairs(groups['control'])
     label_entity_measured = get_label_entity_pairs(groups['measured'])
