@@ -16,7 +16,7 @@ from data_collator import MyDataCollatorForSeq2Seq
 from tqdm import tqdm
 
 logger = logging.getLogger('seq2seq.trainer')
-
+import numpy as np
 
 class SodaSeq2SeqTrainer:
     """
@@ -111,18 +111,18 @@ class SodaSeq2SeqTrainer:
                 for batch in tqdm(test_dataloader):
                     outputs = self.model.generate(batch['input_ids'].to(self.device))
                     preds = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
-                    for pred in preds:
-                        output_predictions.append(pred)
+                    output_predictions.append(preds)
             # Call to my metrics calculator
             metrics_role = ClassificationSeq2Seq(task="roles")
             metrics_ner = ClassificationSeq2Seq(task="ner")
             metrics_exp = ClassificationSeq2Seq(task="experiment")
+            flat_predictions = list(np.concatenate(output_predictions).flat)
             logger.info("Metric evaluation for roles")
-            metrics_role(output_predictions, self.tokenized_dataset['labels'])
+            metrics_role(flat_predictions, self.tokenized_dataset['labels'])
             logger.info("Metric evaluation for NER")
-            metrics_ner(output_predictions, self.tokenized_dataset['labels'])
+            metrics_ner(flat_predictions, self.tokenized_dataset['labels'])
             logger.info("Metric evaluation for experiments")
-            metrics_exp(output_predictions, self.tokenized_dataset['labels'])
+            metrics_exp(flat_predictions, self.tokenized_dataset['labels'])
 
 
 
