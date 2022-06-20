@@ -83,11 +83,8 @@ def get_control_measure_exp_mentions(
     :return: `list` of `tuple` `label` -> `entity`
     """
     print(text)
-    if (text.count("was tested") > 1):
-        text = text.split('.')[0]
-        if (text.count("was tested") > 1):
-            text = text.split('"')[0]
-            print(text)
+    text = text.split('.')[0]
+    text = text.split('"')[0]
 
     regex_str = f"({separators[0]})|({separators[1]})"
     split_text = re.split(regex_str, text)
