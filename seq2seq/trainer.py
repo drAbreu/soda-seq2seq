@@ -120,11 +120,11 @@ class SodaSeq2SeqTrainer:
             metrics_exp = ClassificationSeq2Seq(task="experiment")
             flat_predictions = list(np.concatenate(output_predictions).flat)
             logger.info("Metric evaluation for roles")
-            metrics_role(flat_predictions, self.tokenized_dataset['target'])
+            metrics_role(flat_predictions, self.tokenized_dataset['test']['target'])
             logger.info("Metric evaluation for NER")
-            metrics_ner(flat_predictions, self.tokenized_dataset['target'])
+            metrics_ner(flat_predictions, self.tokenized_dataset['test']['target'])
             logger.info("Metric evaluation for experiments")
-            metrics_exp(flat_predictions, self.tokenized_dataset['target'])
+            metrics_exp(flat_predictions, self.tokenized_dataset['test']['target'])
 
 
 
