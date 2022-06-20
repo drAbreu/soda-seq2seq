@@ -110,7 +110,7 @@ class SodaSeq2SeqTrainer:
             with torch.no_grad():
                 for batch in tqdm(test_dataloader):
                     outputs = self.model.generate(batch['input_ids'].to(self.device))
-                    print(outputs)
+                    print(outputs.shape)
                     batch_predictions = self.tokenizer.decode(outputs.to(self.device), skip_special_tokens=True)
                     for pred in batch_predictions:
                         output_predictions.append(pred)
