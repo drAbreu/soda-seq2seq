@@ -12,6 +12,7 @@ import logging
 from torch.utils.data import DataLoader
 import torch
 from metrics import ClassificationSeq2Seq
+from data_collator import MyDataCollatorForSeq2Seq
 
 logger = logging.getLogger('seq2seq.main')
 
@@ -108,7 +109,10 @@ class SodaSeq2SeqTrainer:
             print(100 * "*")
             test_dataloader = DataLoader(self.tokenized_dataset['test'],
                                          batch_size=16,
-                                         collate_fn=data_collator)
+                                         collate_fn=MyDataCollatorForSeq2Seq(tokenizer=self.tokenizer,
+                                               model=self.model,
+                                               padding=True,
+                                               return_tensors='pt'))
             for batch in test_dataloader:
                 with torch.no_grad():
                     batch_labels = self.tokenizer.decode(batch['labels'], skip_special_tokens=True)
