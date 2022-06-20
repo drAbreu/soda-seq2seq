@@ -82,7 +82,7 @@ def get_control_measure_exp_mentions(
                         Will be used to separate into controled, measured and experiment.
     :return: `list` of `tuple` `label` -> `entity`
     """
-    text = text.split('"')[0]
+    text = text.split('.')[0]
     regex_str = f"({separators[0]})|({separators[1]})"
     split_text = re.split(regex_str, text)
     separators += [None]
