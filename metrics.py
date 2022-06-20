@@ -86,6 +86,7 @@ class ClassificationSeq2Seq:
             for prediction, label in tqdm(zip(predictions, labels)):
                 _, _, pred_experiment = get_labelled_data(prediction, separators=separators)
                 _, _, label_experiment = get_labelled_data(label, separators=separators)
+                print(label_experiment, pred_experiment)
                 jaccard_distance.append(textdistance.jaccard(
                     label_experiment.split(),
                     pred_experiment.split())
