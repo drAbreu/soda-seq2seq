@@ -104,15 +104,13 @@ class SodaSeq2SeqTrainer:
         if self.training_args.do_predict:
             # !TODO: Do this work with the torch DataLoader and getn it into the
             output_predictions, output_labels = [], []
-            print(100 * "*")
-            print(self.tokenized_dataset['test'].column_names)
-            print(100 * "*")
+            test_data_collator = MyDataCollatorForSeq2Seq(tokenizer=self.tokenizer,
+                                                           model=self.model,
+                                                           padding=True,
+                                                           return_tensors='pt')
             test_dataloader = DataLoader(self.tokenized_dataset['test'],
                                          batch_size=16,
-                                         collate_fn=MyDataCollatorForSeq2Seq(tokenizer=self.tokenizer,
-                                               model=self.model,
-                                               padding=True,
-                                               return_tensors='pt'))
+                                         collate_fn=test_data_collator)
             for batch in test_dataloader:
                 with torch.no_grad():
                     batch_labels = self.tokenizer.decode(batch['labels'], skip_special_tokens=True)
