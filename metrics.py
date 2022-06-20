@@ -89,6 +89,8 @@ class ClassificationSeq2Seq:
                 print(label_experiment, pred_experiment)
                 if type(pred_experiment) == list:
                     pred_experiment = " ". join(pred_experiment)
+                if type(pred_experiment) == list:
+                    label_experiment = " ". join(label_experiment)
                 jaccard_distance.append(textdistance.jaccard(
                     label_experiment.split(),
                     pred_experiment.split())
