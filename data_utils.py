@@ -109,7 +109,6 @@ def get_control_measure_exp_mentions(
             output['control'] = output_list[0]
             output['measured'] = ""
             output['experiment'] = ""
-        raise NotImplementedError
     return output
 
 
