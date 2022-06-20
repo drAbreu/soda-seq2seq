@@ -82,9 +82,9 @@ def get_control_measure_exp_mentions(
                         Will be used to separate into controled, measured and experiment.
     :return: `list` of `tuple` `label` -> `entity`
     """
-    if text.count("was tested") != 1:
+    if text.count("was tested") > 1:
         text = text.split('.')[0]
-        if text.count("was tested") != 1:
+        if text.count("was tested") > 1:
             text = text.split('"')[0]
 
     regex_str = f"({separators[0]})|({separators[1]})"
@@ -104,7 +104,11 @@ def get_control_measure_exp_mentions(
         logger.warning(f"The example: {text} has only two text outputs. It might have an infinite"
                        f"loop on the model prediction.")
     else:
-        logger.warning(f"The example: {text} is not working")
+        logger.warning(f"The example: {text} Might have an infinite loop of control entities")
+        if text.count("was tested") < 1:
+            output['control'] = output_list[0]
+            output['measured'] = ""
+            output['experiment'] = ""
         raise NotImplementedError
     return output
 
