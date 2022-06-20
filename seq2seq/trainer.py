@@ -55,6 +55,7 @@ class SodaSeq2SeqTrainer:
         self.training_args = training_args
         self.from_local_checkpoint = from_local_checkpoint
         self.base_model = base_model
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.tokenizer, self.model = self._get_model_and_tokenizer()
 
@@ -100,11 +101,12 @@ class SodaSeq2SeqTrainer:
             trainer.train()
 
         if self.training_args.do_predict:
+            # !TODO: Do this work with the torch DataLoader and getn it into the
             output_predictions, output_labels = [], []
             for example in self.tokenized_dataset['test']:
                 with torch.no_grad():
                     batch_labels = self.tokenizer.decode(example['labels'], skip_special_tokens=True)
-                    outputs = self.model.generate(torch.tensor([example['input_ids']]))
+                    outputs = self.model.generate(torch.tensor([example['input_ids']], device=self.device))
                     batch_predictions = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
                     for l, p in zip(batch_labels, batch_predictions):
                         output_predictions.append(p)
