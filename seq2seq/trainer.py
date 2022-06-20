@@ -110,7 +110,7 @@ class SodaSeq2SeqTrainer:
             print(100*"*")
             for batch in test_dataloader:
                 print(100 * "*")
-                print(batch[0])
+                print(batch)
                 print(100 * "*")
                 with torch.no_grad():
                     outputs = self.model.generate(batch['input_ids'])
