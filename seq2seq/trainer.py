@@ -109,7 +109,7 @@ class SodaSeq2SeqTrainer:
             logger.info(f"The device used at this point is {self.device}")
             with torch.no_grad():
                 for batch in tqdm(test_dataloader):
-                    outputs = self.model.generate(**batch['input_ids'].to(self.device))
+                    outputs = self.model.generate(batch['input_ids'].to(self.device))
                     preds = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
                     for pred in preds:
                         output_predictions.append(pred)
