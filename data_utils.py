@@ -82,10 +82,13 @@ def get_control_measure_exp_mentions(
                         Will be used to separate into controled, measured and experiment.
     :return: `list` of `tuple` `label` -> `entity`
     """
+    print(text)
     if (text.count("was tested") > 1) or (text.count("by") > 1):
         text = text.split('.')[0]
+        print(text)
         if (text.count("was tested") > 1) or (text.count("by") > 1):
             text = text.split('"')[0]
+            print(text)
 
     regex_str = f"({separators[0]})|({separators[1]})"
     split_text = re.split(regex_str, text)
