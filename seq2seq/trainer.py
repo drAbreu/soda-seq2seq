@@ -111,6 +111,7 @@ class SodaSeq2SeqTrainer:
                 for batch in tqdm(test_dataloader):
                     outputs = self.model.generate(batch['input_ids'].to(self.device))
                     print(outputs.shape)
+                    print(outputs[0].shape)
                     batch_predictions = self.tokenizer.decode(outputs.to(self.device), skip_special_tokens=True)
                     for pred in batch_predictions:
                         output_predictions.append(pred)
