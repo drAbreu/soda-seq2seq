@@ -111,10 +111,9 @@ def get_control_measure_exp_mentions(
     else:
         output = {}
         output_list = [text for text in split_text if text not in separators]
-        if len(output_list) == 3:
-            output['control'] = output_list[0]
-            output['measured'] = output_list[1]
-            output['experiment'] = output_list[2:]
+        output['control'] = output_list[0]
+        output['measured'] = output_list[1]
+        output['experiment'] = output_list[2:]
     print(output)
 
     return output
