@@ -31,6 +31,8 @@ class ClassificationSeq2Seq:
             for prediction, label in tqdm(zip(predictions, labels)):
                 pred_controls, pred_measured, _ = get_labelled_data(prediction, separators=separators)
                 label_controls, label_measured, _ = get_labelled_data(label, separators=separators)
+                pred_controls = list(set(pred_controls))
+                pred_measured = list(set(pred_measured))
                 for label_pair in label_controls:
                     if label_pair in pred_controls:
                         cleaned_outputs['predictions'].append("CONTROLLED_VAR")
@@ -65,6 +67,8 @@ class ClassificationSeq2Seq:
             for prediction, label in tqdm(zip(predictions, labels)):
                 pred_controls, pred_measured, _ = get_labelled_data(prediction, separators=separators)
                 label_controls, label_measured, _ = get_labelled_data(label, separators=separators)
+                pred_controls = list(set(pred_controls))
+                pred_measured = list(set(pred_measured))
                 all_preds = list(itertools.chain(pred_controls, pred_measured))
                 all_labels = list(itertools.chain(label_controls, label_measured))
                 for label_pair in all_labels:
