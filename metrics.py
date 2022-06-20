@@ -5,6 +5,7 @@ import numpy as np
 import itertools
 from sklearn.feature_extraction.text import TfidfVectorizer
 import textdistance
+from tqdm import tqdm
 
 class ClassificationSeq2Seq:
     def __init__(self,
@@ -27,7 +28,7 @@ class ClassificationSeq2Seq:
 
         if self.task == 'roles':
             cleaned_outputs = {'predictions': [], 'labels': []}
-            for prediction, label in zip(predictions, labels):
+            for prediction, label in tqdm(zip(predictions, labels)):
                 pred_controls, pred_measured, _ = get_labelled_data(prediction, separators=separators)
                 label_controls, label_measured, _ = get_labelled_data(label, separators=separators)
                 for label_pair in label_controls:
@@ -60,7 +61,7 @@ class ClassificationSeq2Seq:
                   )
         elif self.task == 'ner':
             cleaned_outputs = {'predictions': [], 'labels': []}
-            for prediction, label in zip(predictions, labels):
+            for prediction, label in tqdm(zip(predictions, labels)):
                 pred_controls, pred_measured, _ = get_labelled_data(prediction, separators=separators)
                 label_controls, label_measured, _ = get_labelled_data(label, separators=separators)
                 all_preds = list(itertools.chain(pred_controls, pred_measured))
@@ -82,7 +83,7 @@ class ClassificationSeq2Seq:
                   )
         elif self.task == 'experiment':
             jaccard_distance = []
-            for prediction, label in zip(predictions, labels):
+            for prediction, label in tqdm(zip(predictions, labels)):
                 _, _, pred_experiment = get_labelled_data(prediction, separators=separators)
                 _, _, label_experiment = get_labelled_data(label, separators=separators)
                 jaccard_distance.append(textdistance.jaccard(
