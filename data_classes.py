@@ -8,9 +8,9 @@ import numpy as np
 class TrainingArgumentsSeq2Seq(TrainingArguments):
     output_dir: str = field(default=SEQ2SEQ_MODEL_PATH)
     overwrite_output_dir: bool = field(default=True)
-    do_train: bool = field(default=False)
-    do_eval: bool = field(default=False)
-    do_predict: bool = field(default=True)
+    do_train: bool = field(default=True)
+    do_eval: bool = field(default=True)
+    do_predict: bool = field(default=False)
     evaluation_strategy: IntervalStrategy = field(default="steps")
     prediction_loss_only: bool = field(default=False)
     per_device_train_batch_size: int = field(default=4)
