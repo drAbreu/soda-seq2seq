@@ -14,7 +14,7 @@ import torch
 from metrics import ClassificationSeq2Seq
 from data_collator import MyDataCollatorForSeq2Seq
 
-logger = logging.getLogger('seq2seq.main')
+logger = logging.getLogger('seq2seq.trainer')
 
 
 class SodaSeq2SeqTrainer:
@@ -114,8 +114,11 @@ class SodaSeq2SeqTrainer:
             metrics_role = ClassificationSeq2Seq(task="roles")
             metrics_ner = ClassificationSeq2Seq(task="ner")
             metrics_exp = ClassificationSeq2Seq(task="experiment")
+            logger.info("Metric evaluation for roles")
             metrics_role(output_predictions, self.tokenized_dataset['labels'])
+            logger.info("Metric evaluation for NER")
             metrics_ner(output_predictions, self.tokenized_dataset['labels'])
+            logger.info("Metric evaluation for experiments")
             metrics_exp(output_predictions, self.tokenized_dataset['labels'])
 
 
