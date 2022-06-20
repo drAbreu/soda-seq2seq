@@ -106,11 +106,11 @@ class SodaSeq2SeqTrainer:
             output_predictions, output_labels = [], []
             test_dataloader = trainer.get_test_dataloader(self.tokenized_dataset['test'])
             logger.info("Getting the data predictions")
+            logger.info(f"The device used at this point is {self.device}")
             for batch in tqdm(test_dataloader):
                 with torch.no_grad():
-                    batch = batch.to(self.device)
-                    outputs = self.model.generate(batch['input_ids'])
-                    batch_predictions = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+                    outputs = self.model.generate(batch['input_ids'].to(self.device))
+                    batch_predictions = self.tokenizer.decode(outputs[0].to(self.device), skip_special_tokens=True)
                     for pred in batch_predictions:
                         output_predictions.append(pred)
             # Call to my metrics calculator
