@@ -86,17 +86,18 @@ class SodaSeq2SeqTrainer:
                                                model=self.model,
                                                padding=True,
                                                return_tensors='pt')
+        trainer = Seq2SeqTrainer(
+            model=self.model,
+            args=self.training_args,
+            data_collator=data_collator,
+            train_dataset=self.tokenized_dataset['train'],
+            eval_dataset=self.tokenized_dataset['eval'],
+            test_dataset=self.tokenized_dataset['test'],
+            tokenizer=self.tokenizer,
+            callbacks=[ShowExample(self.tokenizer)]
+        )
 
         if self.training_args.do_train:
-            trainer = Seq2SeqTrainer(
-                                        model=self.model,
-                                        args=self.training_args,
-                                        data_collator=data_collator,
-                                        train_dataset=self.tokenized_dataset['train'],
-                                        eval_dataset=self.tokenized_dataset['eval'],
-                                        tokenizer=self.tokenizer,
-                                        callbacks=[ShowExample(self.tokenizer)]
-                                    )
             trainer.remove_callback(TensorBoardCallback)  # remove default Tensorboard callback
             trainer.add_callback(MyTensorBoardCallback)  # replace with customized callback
             trainer.train()
@@ -104,13 +105,7 @@ class SodaSeq2SeqTrainer:
         if self.training_args.do_predict:
             # !TODO: Do this work with the torch DataLoader and getn it into the
             output_predictions, output_labels = [], []
-            test_data_collator = MyDataCollatorForSeq2Seq(tokenizer=self.tokenizer,
-                                                           model=self.model,
-                                                           padding=True,
-                                                           return_tensors='pt')
-            test_dataloader = DataLoader(self.tokenized_dataset['test'],
-                                         batch_size=16,
-                                         collate_fn=test_data_collator)
+            test_dataloader = trainer.get_test_dataloader()
             for batch in test_dataloader:
                 with torch.no_grad():
                     batch_labels = self.tokenizer.decode(batch['labels'], skip_special_tokens=True)
