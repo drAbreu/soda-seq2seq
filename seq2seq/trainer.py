@@ -103,14 +103,20 @@ class SodaSeq2SeqTrainer:
         if self.training_args.do_predict:
             # !TODO: Do this work with the torch DataLoader and getn it into the
             output_predictions, output_labels = [], []
-            for example in self.tokenized_dataset['test']:
+            print(100 * "*")
+            print(self.tokenized_dataset['test'].column_names)
+            print(100 * "*")
+            test_dataloader = DataLoader(self.tokenized_dataset['test'],
+                                         batch_size=16,
+                                         collate_fn=data_collator)
+            for batch in test_dataloader:
                 with torch.no_grad():
-                    batch_labels = self.tokenizer.decode(example['labels'], skip_special_tokens=True)
-                    outputs = self.model.generate(torch.tensor([example['input_ids']], device=self.device))
+                    batch_labels = self.tokenizer.decode(batch['labels'], skip_special_tokens=True)
+                    outputs = self.model.generate(batch['input_ids'])
                     batch_predictions = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-                    for l, p in zip(batch_labels, batch_predictions):
-                        output_predictions.append(p)
-                        output_labels.append(l)
+                    for lab, pred in zip(batch_labels, batch_predictions):
+                        output_predictions.append(pred)
+                        output_labels.append(lab)
             # Call to my metrics calculator
             metrics_role = ClassificationSeq2Seq(task="roles")
             metrics_ner = ClassificationSeq2Seq(task="ner")
