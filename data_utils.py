@@ -83,35 +83,42 @@ def get_control_measure_exp_mentions(
     :return: `list` of `tuple` `label` -> `entity`
     """
     print(text)
-    if (text.count("was tested") > 1) or (text.count("by") > 1):
+    if (text.count("was tested") > 1):
         text = text.split('.')[0]
-        print(text)
-        if (text.count("was tested") > 1) or (text.count("by") > 1):
+        if (text.count("was tested") > 1):
             text = text.split('"')[0]
             print(text)
 
     regex_str = f"({separators[0]})|({separators[1]})"
     split_text = re.split(regex_str, text)
     separators += [None]
-
-    output = {}
-    output_list = [text for text in split_text if text not in separators]
-    if len(output_list) == 3:
-        output['control'] = output_list[0]
-        output['measured'] = output_list[1]
-        output['experiment'] = output_list[2]
-    elif len(output_list) == 2:
-        output['control'] = output_list[0]
-        output['measured'] = output_list[1]
-        output['experiment'] = ""
-        logger.warning(f"The example: {text} has only two text outputs. It might have an infinite"
-                       f"loop on the model prediction.")
-    else:
-        logger.warning(f"The example: {text} Might have an infinite loop of control entities")
-        if text.count("was tested") < 1:
+    if split_text.count("by") <= 1:
+        output = {}
+        output_list = [text for text in split_text if text not in separators]
+        if len(output_list) == 3:
             output['control'] = output_list[0]
-            output['measured'] = ""
+            output['measured'] = output_list[1]
+            output['experiment'] = output_list[2]
+        elif len(output_list) == 2:
+            output['control'] = output_list[0]
+            output['measured'] = output_list[1]
             output['experiment'] = ""
+            logger.warning(f"The example: {text} has only two text outputs. It might have an infinite"
+                           f"loop on the model prediction.")
+        else:
+            logger.warning(f"The example: {text} Might have an infinite loop of control entities")
+            if text.count("was tested") < 1:
+                output['control'] = output_list[0]
+                output['measured'] = ""
+                output['experiment'] = ""
+    else:
+        output = {}
+        output_list = [text for text in split_text if text not in separators]
+        if len(output_list) == 3:
+            output['control'] = output_list[0]
+            output['measured'] = output_list[1]
+            output['experiment'] = output_list[2:]
+
     return output
 
 
