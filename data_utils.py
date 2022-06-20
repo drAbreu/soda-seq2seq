@@ -99,6 +99,7 @@ def get_control_measure_exp_mentions(
         logger.warning(f"The example: {text} has only two text outputs. It might have an infinite"
                        f"loop on the model prediction.")
     else:
+        logger.warning(f"The example: {text} is not working")
         raise NotImplementedError
     return output
 
