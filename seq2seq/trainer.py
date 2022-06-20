@@ -15,6 +15,7 @@ from metrics import ClassificationSeq2Seq
 from data_collator import MyDataCollatorForSeq2Seq
 from tqdm import tqdm
 import numpy as np
+from sklearn.metrics import classification_report
 
 logger = logging.getLogger('seq2seq.trainer')
 
@@ -115,11 +116,24 @@ class SodaSeq2SeqTrainer:
             metrics_exp = ClassificationSeq2Seq(task="experiment")
             flat_predictions = list(np.concatenate(output_predictions).flat)
             logger.info("Metric evaluation for roles")
-            metrics_role(flat_predictions, self.tokenized_dataset['test']['target'])
+            role_labels, role_predictions = metrics_role(flat_predictions, self.tokenized_dataset['test']['target'])
             logger.info("Metric evaluation for NER")
-            metrics_ner(flat_predictions, self.tokenized_dataset['test']['target'])
+            ner_labels, ner_predictions = metrics_ner(flat_predictions, self.tokenized_dataset['test']['target'])
             logger.info("Metric evaluation for experiments")
-            metrics_exp(flat_predictions, self.tokenized_dataset['test']['target'])
+            jaccard_distance = metrics_exp(flat_predictions, self.tokenized_dataset['test']['target'])
+
+            print(classification_report(np.array(role_labels),
+                                        np.array(role_predictions),
+                                        labels=["MEASURED_VAR", "CONTROLLED_VAR"]
+                                        )
+                  )
+            print(classification_report(np.array(ner_labels),
+                                        np.array(ner_predictions),
+                                        labels=["gene", "protein", "molecule","cell", "organism", "tissue", "subcellular"]
+                                        )
+                  )
+
+            print(f"""The Average Jaccard Distance experiment strings: {jaccard_distance}""")
 
     def _preprocess_data(self, examples):
         """

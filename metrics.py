@@ -53,12 +53,13 @@ class ClassificationSeq2Seq:
                 for label_pair in pred_measured:
                     cleaned_outputs['predictions'].append("MEASURED_VAR")
                     cleaned_outputs['labels'].append("O")
-
             print(classification_report(np.array(cleaned_outputs['labels']),
                                         np.array(cleaned_outputs['predictions']),
                                         labels=self.roles_labels
                                         )
                   )
+            return np.array(cleaned_outputs['labels']),np.array(cleaned_outputs['predictions'])
+
         elif self.task == 'ner':
             cleaned_outputs = {'predictions': [], 'labels': []}
             for prediction, label in tqdm(zip(predictions, labels)):
@@ -81,6 +82,8 @@ class ClassificationSeq2Seq:
                                         labels=self.ner_labels
                                         )
                   )
+            return np.array(cleaned_outputs['labels']), np.array(cleaned_outputs['predictions'])
+
         elif self.task == 'experiment':
             jaccard_distance = []
             for prediction, label in tqdm(zip(predictions, labels)):
@@ -95,5 +98,6 @@ class ClassificationSeq2Seq:
                     pred_experiment.split())
                 )
             print(f"""The Average Jaccard Distance experiment strings: {np.array(jaccard_distance).mean()}""")
+            return np.array(jaccard_distance).mean()
         else:
             pass
