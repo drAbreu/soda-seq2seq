@@ -108,6 +108,7 @@ def get_control_measure_exp_mentions(
                 output['measured'] = ""
                 output['experiment'] = ""
     else:
+        logger.warning(f"The example: {text} Has more than one experimental setup")
         output = {}
         output_list = [text for text in split_text if text not in separators]
         output['control'] = output_list[0]
@@ -131,9 +132,8 @@ def get_labelled_data(
     :return: `list` of `tuple`, `tuple`, `str`
     """
     groups = get_control_measure_exp_mentions(text, separators=separators)
-    print(groups)
 
-    label_entity_control = get_label_entity_pairs(groups['control'])
-    label_entity_measured = get_label_entity_pairs(groups['measured'])
+    label_entity_control = get_label_entity_pairs(groups.get('control', ""))
+    label_entity_measured = get_label_entity_pairs(groups.get('control', ""))
 
     return label_entity_control, label_entity_measured, groups['experiment']
