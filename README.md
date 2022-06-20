@@ -27,7 +27,7 @@ Training the model from a model in the 🤗 Hub. At the moment only the `BART` a
   --skip_lines 0 \
   --eval_steps 500 \
   --logging_steps 50 \
-  --num_train_epochs 10 \
+  --num_train_epochs 12 \
   --lr_scheduler_type 'cosine' \
   --warmup_steps 5000 
 ```
@@ -43,7 +43,7 @@ Training the model beginning from a locally stored checkpoint.
   --skip_lines 0 \
   --eval_steps 500 \
   --logging_steps 50 \
-  --num_train_epochs 10 \
+  --num_train_epochs 12 \
   --lr_scheduler_type 'cosine' \
-  --warmup_steps 5000 
+  --warmup_steps 500 
 ```
