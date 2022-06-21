@@ -21,13 +21,14 @@ Training the model from a model in the 🤗 Hub. At the moment only the `BART` a
 
 ```shell
   python -m cli.seq2seq_train ./data/sd-seq2seq-clean.csv \
-  --from_pretrained facebook/bart-base \
+  --from_pretrained t5-base \
   --task "Causal hypothesis: " \
   --delimiter "###tt9HHSlkWoUM###" \
   --skip_lines 0 \
   --eval_steps 500 \
   --logging_steps 50 \
   --num_train_epochs 10 \
+  --learning_rate 7.5e-5 \
   --lr_scheduler_type 'cosine' \
   --warmup_steps 500
 ```
@@ -45,5 +46,18 @@ Training the model beginning from a locally stored checkpoint.
   --logging_steps 50 \
   --num_train_epochs 12 \
   --lr_scheduler_type 'cosine' \
-  --warmup_steps 500 
+  --warmup_steps 500 \
+  --do_train \
+  --do_eval
+```
+
+Testing the results of a model
+
+```shell
+  python -m cli.seq2seq_train ./data/sd-seq2seq-clean.csv \
+  --from_local_checkpoint ./seq_2seq_models/best-bart-base \
+  --base_model facebook/bart-base \
+  --task "Causal hypothesis: " \
+  --delimiter "###tt9HHSlkWoUM###" \
+  --do_test
 ```

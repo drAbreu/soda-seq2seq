@@ -134,6 +134,20 @@ def get_labelled_data(
     groups = get_control_measure_exp_mentions(text, separators=separators)
 
     label_entity_control = get_label_entity_pairs(groups.get('control', ""))
-    label_entity_measured = get_label_entity_pairs(groups.get('control', ""))
+    label_entity_measured = get_label_entity_pairs(groups.get('measured', ""))
 
-    return label_entity_control, label_entity_measured, groups['experiment']
+    label_entity_control_cleaned, label_entity_measured_cleaned = [], []
+    for key, value in label_entity_control:
+        label_entity_control_cleaned.append(
+            (''.join(filter(str.isalnum, key)),
+             ''.join(filter(str.isalnum, value)))
+        )
+    for key, value in label_entity_measured:
+        label_entity_measured_cleaned.append(
+            (''.join(filter(str.isalnum, key)),
+             ''.join(filter(str.isalnum, value)))
+        )
+
+    return list(set(label_entity_control_cleaned)), \
+           list(set(label_entity_measured_cleaned)), \
+           groups['experiment']
