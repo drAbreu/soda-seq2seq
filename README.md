@@ -58,19 +58,22 @@ Testing the results of a model
   --from_local_checkpoint ./seq2seq_models/best-bart-base \
   --base_model facebook/bart-base \
   --task "Causal hypothesis: " \
-  --delimiter "###tt9HHSlkWoUM###" 
+  --delimiter "###tt9HHSlkWoUM###" \
+  --do_predict
   
     python -m cli.seq2seq_train ./data/sd-seq2seq-clean.csv \
   --from_local_checkpoint ./seq2seq_models/best-t5-base \
   --base_model t5-base \
   --task "Causal hypothesis: " \
-  --delimiter "###tt9HHSlkWoUM###" 
+  --delimiter "###tt9HHSlkWoUM###" \
+  --do_predict \
+  --top_k 25 \
+  --top_p 0.9
   
     python -m cli.seq2seq_train ./data/sd-seq2seq-clean.csv \
-  --from_local_checkpoint ./seq2seq_models/best_bart_large \
+  --from_local_checkpoint ./seq2seq_models/best_bert_large \
   --base_model facebook/bart-large \
   --task "Causal hypothesis: " \
-  --delimiter "###tt9HHSlkWoUM###" 
-
-
+  --delimiter "###tt9HHSlkWoUM###" \
+  --do_predict
 ```
