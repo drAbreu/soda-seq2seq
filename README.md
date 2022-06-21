@@ -55,9 +55,22 @@ Testing the results of a model
 
 ```shell
   python -m cli.seq2seq_train ./data/sd-seq2seq-clean.csv \
-  --from_local_checkpoint ./seq_2seq_models/best-bart-base \
+  --from_local_checkpoint ./seq2seq_models/best-bart-base \
   --base_model facebook/bart-base \
   --task "Causal hypothesis: " \
-  --delimiter "###tt9HHSlkWoUM###" \
-  --do_test
+  --delimiter "###tt9HHSlkWoUM###" 
+  
+    python -m cli.seq2seq_train ./data/sd-seq2seq-clean.csv \
+  --from_local_checkpoint ./seq2seq_models/best-t5-base \
+  --base_model t5-base \
+  --task "Causal hypothesis: " \
+  --delimiter "###tt9HHSlkWoUM###" 
+  
+    python -m cli.seq2seq_train ./data/sd-seq2seq-clean.csv \
+  --from_local_checkpoint ./seq2seq_models/best_bart_large \
+  --base_model facebook/bart-large \
+  --task "Causal hypothesis: " \
+  --delimiter "###tt9HHSlkWoUM###" 
+
+
 ```
