@@ -43,10 +43,10 @@ if __name__ == '__main__':
     #                              model_param=model_args)
     bb = BlurbTrainer(dataset_name="BC5CDR-chem-IOB",
                      task_name="Tag entities",
-                     model="facebook/bart-base",
-                     from_pretrained="facebook/bart-base",
+                     model="t5-base",
+                     from_pretrained="t5-base",
                      from_local_checkpoint=None,
-                     base_model="facebook/bart-base",
+                     base_model="t5-base",
                      # TOKENIZER PARAMETERS
                      max_input_length=512,
                      max_target_length=512,

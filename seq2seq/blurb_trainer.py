@@ -52,6 +52,9 @@ class BlurbTrainer(BlurbBenchmark):
         self.tokenizer, self.model = self._get_model_and_tokenizer()
         self.tokenized_dataset = self._tokenize_data()
 
+        print(self.blurb_data.dataset_seq2seq['train'][0:5])
+        print(self.tokenized_dataset['train'][0:5])
+
     def __call__(self):
 
         logger.info(f"""Preparing the data collator""")
@@ -152,9 +155,9 @@ class BlurbTrainer(BlurbBenchmark):
         :param examples: iterable elements of the dataset
         :return: tokenized examples for a `Dataset.map` or `DatasetDict.map`.
         """
-        input_ = list(map(lambda orig_string: self.task_name + orig_string, examples['inputs']))
+        # input_ = list(map(lambda orig_string: self.task_name + orig_string, examples['inputs']))
         model_inputs = self.tokenizer(
-            input_, max_length=self.max_input_length, truncation=True
+            examples['inputs'], max_length=self.max_input_length, truncation=True
         )
         # Set up the tokenizer for targets
         with self.tokenizer.as_target_tokenizer():

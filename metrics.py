@@ -105,3 +105,8 @@ class ClassificationSeq2Seq:
             return np.array(jaccard_distance).mean()
         else:
             pass
+
+
+# class BlurbMetrics():
+#     def __init__(self,
+#                 task_name: str = )
