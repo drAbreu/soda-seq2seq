@@ -85,8 +85,8 @@ class BlurbTrainer(BlurbBenchmark):
                     outputs = self.model.generate(batch['input_ids'].to(self.device))
                     preds = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
                     output_predictions.append(preds)
-                print(preds[0])
-                print(batch[0])
+                print(preds)
+                print(batch)
 
             # # Call to my metrics calculator
             # metrics_role = ClassificationSeq2Seq(task="roles")
