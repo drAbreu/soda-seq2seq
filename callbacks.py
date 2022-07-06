@@ -84,12 +84,12 @@ class ShowExample(TrainerCallback):
         print(f"{BColors.OKGREEN} Input: {BColors.ENDC}")
         print(inputs)
         print(f"{BColors.OKGREEN} Output: {BColors.ENDC}")
-        print(pred)
+        print(pred.split('.')[0])
         print(f"{BColors.OKGREEN} Expected output: {BColors.ENDC}")
         print(labels)
         print(50*"*")
 
-
+    
 class MyTensorBoardCallback(TensorBoardCallback):
     """Display log and metrics. Modified to plot losses together and to plot supp_data items
     passed in the model output. Also looks for logs elements with  _img_ in keys to display as images."""

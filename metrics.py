@@ -6,6 +6,8 @@ import itertools
 from sklearn.feature_extraction.text import TfidfVectorizer
 import textdistance
 from tqdm import tqdm
+from seq2seq.blurb_trainer import BlurbTrainer
+import re
 
 class ClassificationSeq2Seq:
     def __init__(self,
@@ -107,6 +109,91 @@ class ClassificationSeq2Seq:
             pass
 
 
-# class BlurbMetrics():
-#     def __init__(self,
-#                 task_name: str = )
+class BlurbMetrics:
+    def __init__(self,
+                results_file: str,
+                separator: str,
+                label_mode: str):
+        self.results_file = results_file
+        self.separator = separator
+        self.predictions, self.labels = self._read_results_file()
+        self.label_mode = label_mode
+        self.id2label = {0: "0", 1: "B-Chemical", 2: "I-Chemical"}
+        self.label2id = {"0": 0, "B-Chemical": 1, "I-Chemical": 2}
+        self.tagged_entities_regex = r"([B-I]-\S+)\:(\S+)"
+
+    def __call__(self):
+        if self.label_mode == "full-text":
+            counter = 0
+            predictions_list, labels_list = [], []
+            for p, l in zip(self.predictions, self.labels):
+                result = self._get_single_result_full_text(p.split(".")[0], l.split(".")[0])
+                if result == ([], []):
+                    counter += 1
+                else:
+                    predictions_list.extend(result[0])
+                    labels_list.extend(result[1])
+            print(f"Missmatches {counter} of {len(self.predictions)} = {100 * counter / len(self.predictions)}")
+            print(np.array(labels_list).shape)
+            print(np.array(predictions_list).shape)
+            print(classification_report(np.array(labels_list), np.array(predictions_list), target_names=["O", "B-Chemical", "I-Chemical"]))
+
+    
+    def _read_results_file(self):
+        preds, labels = [], []
+        with open(self.results_file, 'r') as file_:
+            for line in file_.readlines():
+                pred, label = line.split(self.separator)
+                preds.append(pred)
+                labels.append(label)
+            assert len(preds) == len(labels), """Length of predictions and labels must be the same"""
+        return preds, labels
+
+    def _string_to_list(self,prediction):
+        return prediction.split()
+
+    def _from_text_to_predictions(self,text):
+        
+        prediction = []
+        for word in text:
+            match = re.match(self.tagged_entities_regex, word)
+            if match:
+                tag = self.label2id.get(match.string.split(":")[0], 0)
+                prediction.append(tag)
+            else:
+                prediction.append(0)
+        return prediction
+
+    def _get_single_result_full_text(self, p, l):
+        label_list = l.split()
+        total_labels_in_example = len(label_list)
+        predictions = self._from_text_to_predictions(p.split())
+        expected = self._from_text_to_predictions(l.split())
+        if len(predictions) == len(expected):
+            return predictions, expected
+        else:
+            if total_labels_in_example > 1:
+                alt_predictions = []
+                alt_expected = []
+                predictions_label_name_pair = re.findall(self.tagged_entities_regex, p)
+                expected_label_name_pair = re.findall(self.tagged_entities_regex, l)
+                for pair in expected_label_name_pair:
+                    alt_expected.append(self.label2id[pair[0]])
+                    if pair in predictions_label_name_pair:
+                        alt_predictions.append(self.label2id[pair[0]])
+                        predictions_label_name_pair.remove(pair)
+                    if pair not in predictions_label_name_pair:
+                        alt_predictions.append(0)
+                for pair in predictions_label_name_pair:
+                    alt_predictions.append(self.label2id.get(pair[0],0))
+                while len(alt_predictions) < total_labels_in_example:
+                    alt_predictions.append(0)
+                while len(alt_expected) < total_labels_in_example:
+                    alt_expected.append(0)
+                assert len(alt_predictions) == len(alt_expected)  , f"Not Same lengths {len(alt_predictions)} {len(alt_expected)}"
+                return alt_predictions, alt_expected
+            else:
+                return [], []
+
+
+

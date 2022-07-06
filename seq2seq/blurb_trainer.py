@@ -12,16 +12,16 @@ from callbacks import ShowExample, MyTensorBoardCallback
 import logging
 from torch.utils.data import DataLoader
 import torch
-from metrics import ClassificationSeq2Seq
-from data_collator import MyDataCollatorForSeq2Seq
+# from metrics import ClassificationSeq2Seq
+# from data_collator import MyDataCollatorForSeq2Seq
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics import classification_report
 
-from blurb_benchmark import BlurbBenchmark
+from blurb_benchmark import BlurbIOBToSeq2Seq
 
 
-class BlurbTrainer(BlurbBenchmark):
+class BlurbTrainer(BlurbIOBToSeq2Seq):
     def __init__(self,
                  from_pretrained: str,
                  from_local_checkpoint: str = None,
@@ -43,17 +43,17 @@ class BlurbTrainer(BlurbBenchmark):
         self.max_target_length = max_target_length
         self.model_param = model_param
         self.training_args = training_args
-        self.blurb_data = BlurbBenchmark(dataset_name=self.dataset_name,
+        self.blurb_data = BlurbIOBToSeq2Seq(dataset_name=self.dataset_name,
                                          task_name=self.task_name,
-                                         model=self.model
+                                         model=self.model,
+                                         separator=self.separator,
+                                         label_mode=self.label_mode
                                         )
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.tokenizer, self.model = self._get_model_and_tokenizer()
         self.tokenized_dataset = self._tokenize_data()
-
-        print(self.blurb_data.dataset_seq2seq['train'][0:5])
-        print(self.tokenized_dataset['train'][0:5])
+        print(self.tokenized_dataset['train'][0])
 
     def __call__(self):
 
@@ -78,7 +78,7 @@ class BlurbTrainer(BlurbBenchmark):
             trainer.train()
 
         if self.training_args.do_predict:
-            output_predictions, output_labels = [], []
+            output_predictions = []
             test_dataloader = trainer.get_test_dataloader(self.tokenized_dataset['test'])
             logger.info("Getting the data predictions")
             logger.info(f"Data columns: {self.tokenized_dataset['test'].column_names}")
@@ -87,34 +87,11 @@ class BlurbTrainer(BlurbBenchmark):
                 for batch in tqdm(test_dataloader):
                     outputs = self.model.generate(batch['input_ids'].to(self.device))
                     preds = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
-                    output_predictions.append(preds)
-                print(preds)
-                print(batch)
-
-            # # Call to my metrics calculator
-            # metrics_role = ClassificationSeq2Seq(task="roles")
-            # metrics_ner = ClassificationSeq2Seq(task="ner")
-            # metrics_exp = ClassificationSeq2Seq(task="experiment")
-            # flat_predictions = list(np.concatenate(output_predictions).flat)
-            # logger.info("Metric evaluation for roles")
-            # role_labels, role_predictions = metrics_role(flat_predictions, self.tokenized_dataset['test']['target'])
-            # logger.info("Metric evaluation for NER")
-            # ner_labels, ner_predictions = metrics_ner(flat_predictions, self.tokenized_dataset['test']['target'])
-            # logger.info("Metric evaluation for experiments")
-            # jaccard_distance = metrics_exp(flat_predictions, self.tokenized_dataset['test']['target'])
-            #
-            # print(classification_report(np.array(role_labels),
-            #                             np.array(role_predictions),
-            #                             labels=["MEASURED_VAR", "CONTROLLED_VAR"]
-            #                             )
-            #       )
-            # print(classification_report(np.array(ner_labels),
-            #                             np.array(ner_predictions),
-            #                             labels=["gene", "protein", "molecule","cell", "organism", "tissue", "subcellular"]
-            #                             )
-            #       )
-            #
-            # print(f"""The Average Jaccard Distance experiment strings: {jaccard_distance}""")
+                    output_predictions.extend(preds)
+            
+            with open("demofile.csv", "w") as file_:
+                for pred, label in zip(output_predictions, self.tokenized_dataset['test']):
+                    file_.write(f"""{pred} ###separator### {label["targets"]}\n""")
 
     def _get_model_and_tokenizer(self):
         if self.from_local_checkpoint:
@@ -134,12 +111,12 @@ class BlurbTrainer(BlurbBenchmark):
             if 'bart' in self.from_pretrained:
                 model = BartForConditionalGeneration.from_pretrained(self.from_pretrained,
                                                                           **self.model_param.__dict__)
-            elif 't5' in self.from_pretrained:
+            elif ('t5' in self.from_pretrained) or ('SciFive' in self.from_pretrained):
                 model = T5ForConditionalGeneration.from_pretrained(self.from_pretrained,
                                                                         **self.model_param.__dict__)
             else:
                 raise ValueError(f"""Please select a model that is compatible wit the 
-                                    conditional generation task: {['bart', 't5']}.""")
+                                    conditional generation task: {['bart', 't5', 'SciFive']}.""")
             tokenizer = AutoTokenizer.from_pretrained(self.from_pretrained)
         return tokenizer, model
 
